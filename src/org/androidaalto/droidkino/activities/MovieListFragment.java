@@ -4,10 +4,15 @@ package org.androidaalto.droidkino.activities;
 import org.androidaalto.droidkino.DroidKinoApplicationCache;
 import org.androidaalto.droidkino.adapter.MovieListAdapter;
 import org.androidaalto.droidkino.beans.MovieInfo;
+import org.androidaalto.droidkino.loaders.MovieListLoader;
+import org.androidaalto.droidkino.loaders.MovieListLoaderManager;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ListView;
@@ -24,7 +29,7 @@ import java.util.List;
  * @see MovieInfo
  * @see DroidKinoApplicationCache
  */
-public class MovieListFragment extends ListFragment {
+public class MovieListFragment extends ListFragment implements LoaderCallbacks<List<MovieInfo>> {
 
     public static final String LOG_TAG = MovieListFragment.class.getCanonicalName();
 
@@ -59,18 +64,22 @@ public class MovieListFragment extends ListFragment {
          * Sets the list of MovieInfo beans to a MovieListAdapter, which is then
          * set as the adapter for this activity.
          */
-        if (currentMovieList != null) {
-            MovieListAdapter adapter = new MovieListAdapter(getActivity(), currentMovieList);
-            setListAdapter(adapter);
-            adapter.sortByTitle();
-        }
+        // if (currentMovieList != null) {
+        // MovieListAdapter adapter = new MovieListAdapter(getActivity(),
+        // currentMovieList);
+        // setListAdapter(adapter);
+        // adapter.sortByTitle();
+        // }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setListShown(currentMovieList != null);
+        // Prepare the loader. Either re-connect with an existing one,
+        // or start a new one.
+        getLoaderManager().initLoader(0, null, this);
     }
+
     /**
      * If an a item is clicked then a the Movie Detail activity is launched,
      * passing the corresponding MovieInfo bean in the intent extras.
@@ -127,5 +136,23 @@ public class MovieListFragment extends ListFragment {
         // Supply movie list
         movieListFragment.setCurrentMovieList(movieList);
         return movieListFragment;
+    }
+
+    @Override
+    public Loader<List<MovieInfo>> onCreateLoader(int id, Bundle args) {
+        return new MovieListLoader(getActivity(), null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<MovieInfo>> loader, List<MovieInfo> data) {
+        setCurrentMovieList(data);
+        MovieListAdapter adapter = new MovieListAdapter(getActivity(), data);
+        setListAdapter(adapter);
+        adapter.sortByTitle();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<MovieInfo>> loader) {
+        setListAdapter(null);
     }
 }

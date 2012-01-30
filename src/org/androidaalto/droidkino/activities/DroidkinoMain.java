@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -79,7 +80,7 @@ public class DroidkinoMain extends FragmentActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        startFetchMovieListService();
+        // startFetchMovieListService();
     }
 
     /**
@@ -150,16 +151,19 @@ public class DroidkinoMain extends FragmentActivity {
             }
         });
 
-        // Create dummy empty fragment. Used to display a progress icon
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.fragment_container, MovieListFragment.newInstance(null));
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
+        Fragment previous = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (previous == null) {
+            // Create dummy empty fragment. Used to display a progress icon
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, MovieListFragment.newInstance(null));
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            ft.commit();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(mBroadcastReceiver);
+        // unregisterReceiver(mBroadcastReceiver);
     }
 }
